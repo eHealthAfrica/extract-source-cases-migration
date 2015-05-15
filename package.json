@@ -26,7 +26,8 @@
   "devDependencies": {
     "tap-spec": "^3.0.0",
     "tape": "^4.0.0",
-    "tape-chai": "^1.1.0"
+    "tape-chai": "^1.1.0",
+    "timekeeper": "0.0.5"
   },
   "dependencies": {
     "pouchdb": "^3.5.0",
