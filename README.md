@@ -1,6 +1,8 @@
 # extract-source-cases-migration
 Extract inlined source case information into dedicated person documents.
 
+[![Build Status](https://magnum.travis-ci.com/eHealthAfrica/extract-source-cases-migration.svg?token=Xm4EKuRzMq3zwKYpneZz)](https://magnum.travis-ci.com/eHealthAfrica/extract-source-cases-migration)
+
 Usage
 -----
 
