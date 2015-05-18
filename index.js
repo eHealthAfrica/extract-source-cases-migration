@@ -5,6 +5,21 @@ function notMigrated (cases) {
     return cases.some(function (c) { return !c.personId })
 }
 
+function extractNames (name) {
+  if (name && name.length > 0) {
+    var names = name.split(/\s+/)
+    if (names.length > 1) {
+      return [ names.slice(0, -1).join(' ')
+             , names.splice(-1)[0]
+             ]
+    } else {
+      return [names[0], '']
+    }
+  } else {
+    return ['', '']
+  }
+}
+
 function transform (original) {
   var docs = null
 
@@ -34,15 +49,30 @@ function transform (original) {
           if (sourceCase.personId) {
             return sourceCase
           } else {
-            var inline = { personId: utils.uuid().toLowerCase()
+            var names = extractNames(sourceCase.name)
+              , inline = { personId: utils.uuid().toLowerCase()
                          }
               , person = { _id: inline.personId
                          , docType: 'person'
                          , version: '1.16.0'
                          , createdDate: now.toISOString()
-                         , "case": { id: sourceCase.id }
+                         , otherNames: names[0]
+                         , surname: names[1]
+                         , phoneNumber: sourceCase.phone
+                         , relative: sourceCase.relative
+                         , "case":
+                           { id: sourceCase.id
+                           , status: 'unknown'
+                           }
                          }
+
+            for (key in sourceCase) {
+              if (['id', 'phone', 'relative', 'name'].indexOf(key) < 0) {
+                inline[key] = sourceCase[key]
+              }
+            }
             docs.push(person)
+
             return inline
           }
         }

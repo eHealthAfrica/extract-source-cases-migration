@@ -69,13 +69,11 @@ it('copies revision', function (expect) {
 })
 
 it('references extracted source cases', function (expect) {
-  var doc = fakeDoc({ contact: { sourceCases:
-    [ {} ]
-  }})
+  var doc = fakeDoc()
   var result = transform(doc)
-  var personId = result[0].contact.sourceCases[0].personId
+  var nested = result[0].contact.sourceCases[0]
   var person = result[1]
-  expect.equal(personId, person._id)
+  expect.propertyVal(nested, 'personId', person._id)
   expect.end()
 })
 
@@ -86,8 +84,58 @@ it('does not transform already extracted source cases', function (expect) {
     ]
   }})
   var result = transform(doc)
-  var personId = result[0].contact.sourceCases[0].personId
-  expect.equal(personId, 'd64263ec-8a1a-3a99-8118-474bfec2d287')
+  var nested = result[0].contact.sourceCases[0]
+  expect.propertyVal(nested, 'personId', 'd64263ec-8a1a-3a99-8118-474bfec2d287')
+  expect.end()
+})
+
+it('removes case id from source case', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { id: 'qx0255' }
+  ]}})
+  var result = transform(doc)
+  var nested = result[0].contact.sourceCases[0]
+  expect.notProperty(nested, 'id')
+  expect.end()
+})
+
+it('removes phone number from source case', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { phone: '12345678' }
+  ]}})
+  var result = transform(doc)
+  var nested = result[0].contact.sourceCases[0]
+  expect.notProperty(nested, 'phone')
+  expect.end()
+})
+
+it('removes info on relative from source case', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { relative: { phone: '12345678' } }
+  ]}})
+  var result = transform(doc)
+  var nested = result[0].contact.sourceCases[0]
+  expect.notProperty(nested, 'relative')
+  expect.end()
+})
+
+it('removes name from source case', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { name: 'John Doe' }
+  ]}})
+  var result = transform(doc)
+  var nested = result[0].contact.sourceCases[0]
+  expect.notProperty(nested, 'name')
+  expect.end()
+})
+
+it('keeps other info in nested source case doc', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { exposures: [ 'objects' ] }
+  ]}})
+  var result = transform(doc)
+  var nested = result[0].contact.sourceCases[0]
+  expect.deepPropertyVal(nested, 'exposures[0]', 'objects')
   expect.end()
 })
 
@@ -139,3 +187,65 @@ it('creates timestamp', function (expect) {
     expect.end()
   }
 })
+
+it('creates case with status', function (expect) {
+  var doc = fakeDoc()
+  var created = transform(doc)[1]
+  expect.deepPropertyVal(created, 'case.status', 'unknown')
+  expect.end()
+})
+
+it('transfers phone number', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    {phone: '123456789'}
+  ]}})
+  var created = transform(doc)[1]
+  expect.propertyVal(created, 'phoneNumber', '123456789')
+  expect.end()
+})
+
+it('transfers info on relative', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { relative: { phone: '2345612' } }
+  ]}})
+  var created = transform(doc)[1]
+  expect.deepPropertyVal(created, 'relative.phone', '2345612')
+  expect.end()
+})
+
+it('extracts surname', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { name: 'Sally S. Doe' }
+  ]}})
+  var created = transform(doc)[1]
+  expect.propertyVal(created, 'surname', 'Doe')
+  expect.end()
+})
+
+it('extracts other names', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { name: 'Sally S. Doe' }
+  ]}})
+  var created = transform(doc)[1]
+  expect.propertyVal(created, 'otherNames', 'Sally S.')
+  expect.end()
+})
+
+it('takes single name for other names', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { name: 'Sally' }
+  ]}})
+  var created = transform(doc)[1]
+  expect.propertyVal(created, 'otherNames', 'Sally')
+  expect.end()
+})
+
+it('skips surname when single name', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { name: 'Sally' }
+  ]}})
+  var created = transform(doc)[1]
+  expect.propertyVal(created, 'surname', '')
+  expect.end()
+})
+
