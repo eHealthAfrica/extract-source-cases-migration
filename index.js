@@ -42,10 +42,18 @@ function transform (original) {
         transformed.contact[key] = original.contact[key]
       }
 
+      transformed.changeLog = transformed.changeLog || []
+      transformed.changeLog.push(
+        { user: 'extract-source-cases-migration'
+        , rev: original._rev
+        , timestamp: now.getTime()
+        }
+      )
+
       docs = [transformed]
 
       transformed.contact.sourceCases = original.contact.sourceCases.map(
-        function (sourceCase) {
+        function (sourceCase, index) {
           if (sourceCase.personId) {
             return sourceCase
           } else {
@@ -64,6 +72,17 @@ function transform (original) {
                            { id: sourceCase.id
                            , status: 'unknown'
                            }
+                         , sources:
+                           [ { type: 'migration'
+                             , name: 'extract-source-cases-migration'
+                             , timestamp: now.getTime()
+                             , origin: [ original._id
+                                       , 'contact'
+                                       , 'source-cases'
+                                       , index
+                                       ].join('/')
+                             }
+                           ]
                          }
 
             for (key in sourceCase) {

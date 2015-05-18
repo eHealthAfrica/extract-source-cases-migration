@@ -84,7 +84,7 @@ This will produce the following data structure for `docs`:
     [
       { type: 'migration'
       , name: 'extract-source-cases-migration'
-      , original: '00ae40fe-7b6f-4cea-df66-e00b59713944/source-cases/0'
+      , origin: '00ae40fe-7b6f-4cea-df66-e00b59713944/contact/source-cases/0'
       , timestamp: 1422613414251
       }
     ]

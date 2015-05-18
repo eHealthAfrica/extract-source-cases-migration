@@ -150,6 +150,8 @@ it('returns extracted cases', function (expect) {
   expect.end()
 })
 
+// TODO 150518 [tc] case needs required field 'onsetDate'
+
 it('does not extract external source cases', function (expect) {
   var doc = fakeDoc({ contact: { sourceCases:
     [ {personId: 'd64263ec-8a1a-3a99-8118-474bfec2d287'}
@@ -249,3 +251,73 @@ it('skips surname when single name', function (expect) {
   expect.end()
 })
 
+// meta-data ------------------------------------------------------------------
+
+it('adds script name to change log', function (expect) {
+  var doc = fakeDoc()
+  var result = transform(doc)
+  var changed = result[0]
+  expect.deepPropertyVal(changed, 'changeLog[0].user'
+                                , 'extract-source-cases-migration')
+  expect.end()
+})
+
+it('adds revision to change log', function (expect) {
+  var doc = fakeDoc({_rev: '5-revision-hash-id'})
+  var result = transform(doc)
+  var changed = result[0]
+  expect.deepPropertyVal(changed, 'changeLog[0].rev', '5-revision-hash-id')
+  expect.end()
+})
+
+it('adds timestamp to change log', function (expect) {
+  var doc = fakeDoc()
+  var now = new Date(1422613414251)
+  try {
+    timekeeper.freeze(now)
+    var result = transform(doc)
+    var changed = result[0]
+    expect.deepPropertyVal(changed, 'changeLog[0].timestamp'
+                                  , 1422613414251)
+  } finally {
+    timekeeper.reset()
+    expect.end()
+  }
+})
+
+it('adds source entry on created docs', function (expect) {
+  var doc = fakeDoc()
+  var created = transform(doc)[1]
+  expect.deepPropertyVal(created, 'sources[0].type', 'migration')
+  expect.end()
+})
+
+it('adds migration name to source entry', function (expect) {
+  var doc = fakeDoc()
+  var created = transform(doc)[1]
+  expect.deepPropertyVal(created, 'sources[0].name'
+                                , 'extract-source-cases-migration')
+  expect.end()
+})
+
+it('adds timestamp to source entry', function (expect) {
+  var doc = fakeDoc()
+  var now = new Date(1422613414251)
+  try {
+    timekeeper.freeze(now)
+    var result = transform(doc)
+    var created = result[1]
+    expect.deepPropertyVal(created, 'sources[0].timestamp', 1422613414251)
+  } finally {
+    timekeeper.reset()
+    expect.end()
+  }
+})
+
+it('refers back into original doc', function (expect) {
+  var doc = fakeDoc({_id: '123-cdef-678'})
+  var created = transform(doc)[1]
+  expect.deepPropertyVal(created, 'sources[0].origin'
+                                , '123-cdef-678/contact/source-cases/0')
+  expect.end()
+})
