@@ -10,7 +10,7 @@ var migration = require('./')
 var db = new PouchDB(url)
 
 db
-  .migrate(migration, { live: true })
+  .migrate(migration, { live: false })
   .then(function(response) {
     console.log(response)
   })
