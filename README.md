@@ -66,7 +66,7 @@ This will produce the following data structure for `docs`:
   // remaining docs are the extracted cases
 
   { _id: 'fdbe63ec2cf62e484922c6f4203b5695'
-  , docType: 'person'
+  , doc_type: 'person'
   , version: '1.16.0'
   , createdDate: '2015-03-11T10:45:14.715Z' // now
   , surname: 'Doe'

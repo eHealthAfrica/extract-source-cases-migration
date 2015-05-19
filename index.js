@@ -61,7 +61,7 @@ function transform (original) {
               , inline = { personId: utils.uuid().toLowerCase()
                          }
               , person = { _id: inline.personId
-                         , docType: 'person'
+                         , doc_type: 'person'
                          , version: '1.16.0'
                          , createdDate: now.toISOString()
                          , otherNames: names[0]

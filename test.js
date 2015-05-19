@@ -150,8 +150,6 @@ it('returns extracted cases', function (expect) {
   expect.end()
 })
 
-// TODO 150518 [tc] case needs required field 'onsetDate'
-
 it('does not extract external source cases', function (expect) {
   var doc = fakeDoc({ contact: { sourceCases:
     [ {personId: 'd64263ec-8a1a-3a99-8118-474bfec2d287'}
@@ -166,7 +164,7 @@ it('does not extract external source cases', function (expect) {
 it('creates person doc', function (expect) {
   var doc = fakeDoc()
   var created = transform(doc)[1]
-  expect.propertyVal(created, 'docType', 'person')
+  expect.propertyVal(created, 'doc_type', 'person')
   expect.end()
 })
 
