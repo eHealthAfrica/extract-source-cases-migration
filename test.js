@@ -1,20 +1,17 @@
 'use strict'
 var timekeeper = require('timekeeper')
+  , dataModels = require('data-models')
 
 var transform = require('./')
   , it = require('tape')
   , chai = require('tape-chai')
 
 function fakeDoc(props) {
-  var doc =
-    { _id: '00ae40fe-7b6f-4cea-df66-e00b59713944'
-    , _rev: '8-3a99b57d89647c15056dfb6a0ae9eb77'
-    , contact:
-      { sourceCases:
-        [
-          { id: 'q0255' }
-        ]
-      }
+  var doc = dataModels.generate('person', 1).person[0]
+  doc._rev = '8-3a99b57d89647c15056dfb6a0ae9eb77'
+  doc.contact =
+    { status: 'active'
+    , sourceCases: [ { id: 'q0255' } ]
     }
 
   for (var key in props) {
@@ -139,6 +136,14 @@ it('keeps other info in nested source case doc', function (expect) {
   expect.end()
 })
 
+it('produces valid doc for changed original', function (expect) {
+  var doc = fakeDoc()
+  var result = transform(doc)
+  var errors = dataModels.validate(result[0])
+  expect.notOk(errors)
+  expect.end()
+})
+
 // extract --------------------------------------------------------------------
 
 it('returns extracted cases', function (expect) {
@@ -245,7 +250,7 @@ it('skips surname when single name', function (expect) {
     { name: 'Sally' }
   ]}})
   var created = transform(doc)[1]
-  expect.propertyVal(created, 'surname', '')
+  expect.notProperty(created, 'surname')
   expect.end()
 })
 
@@ -317,5 +322,13 @@ it('refers back into original doc', function (expect) {
   var created = transform(doc)[1]
   expect.deepPropertyVal(created, 'sources[0].origin'
                                 , '123-cdef-678/contact/source-cases/0')
+  expect.end()
+})
+
+it('creates valid docs', function (expect) {
+  var doc = fakeDoc()
+  var result = transform(doc)
+  var errors = dataModels.validate(result[1])
+  expect.notOk(errors)
   expect.end()
 })

@@ -6,17 +6,17 @@ function notMigrated (cases) {
 }
 
 function extractNames (name) {
-  if (name && name.length > 0) {
+  if (name) {
     var names = name.split(/\s+/)
     if (names.length > 1) {
       return [ names.slice(0, -1).join(' ')
              , names.splice(-1)[0]
              ]
     } else {
-      return [names[0], '']
+      return [names[0], null]
     }
   } else {
-    return ['', '']
+    return [null, null]
   }
 }
 
@@ -57,17 +57,12 @@ function transform (original) {
           if (sourceCase.personId) {
             return sourceCase
           } else {
-            var names = extractNames(sourceCase.name)
-              , inline = { personId: utils.uuid().toLowerCase()
-                         }
-              , person = { _id: inline.personId
+            var id = utils.uuid().toLowerCase()
+              , inline = { personId: id }
+              , person = { _id: id
                          , doc_type: 'person'
                          , version: '1.16.0'
                          , createdDate: now.toISOString()
-                         , otherNames: names[0]
-                         , surname: names[1]
-                         , phoneNumber: sourceCase.phone
-                         , relative: sourceCase.relative
                          , "case":
                            { id: sourceCase.id
                            , status: 'unknown'
@@ -84,6 +79,24 @@ function transform (original) {
                              }
                            ]
                          }
+
+            var names  = extractNames(sourceCase.name)
+
+            if (names[0]) {
+              person.otherNames = names[0]
+            }
+
+            if (names[1]) {
+              person.surname = names[1]
+            }
+
+            if (sourceCase.phone) {
+              person.phoneNumber = sourceCase.phone
+            }
+
+            if (sourceCase.relative) {
+              person.relative = sourceCase.relative
+            }
 
             for (key in sourceCase) {
               if (['id', 'phone', 'relative', 'name'].indexOf(key) < 0) {

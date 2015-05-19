@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/eHealthAfrica/extract-source-cases-migration",
   "devDependencies": {
+    "data-models": "^1.18.0",
     "tap-spec": "^3.0.0",
     "tape": "^4.0.0",
     "tape-chai": "^1.1.0",
