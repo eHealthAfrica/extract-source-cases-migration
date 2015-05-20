@@ -106,6 +106,16 @@ it('removes phone number from source case', function (expect) {
   expect.end()
 })
 
+it('removes onsetDate from source case', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { onsetDate: '2015-05-20T11:44:53.427Z' }
+  ]}})
+  var result = transform(doc)
+  var nested = result[0].contact.sourceCases[0]
+  expect.notProperty(nested, 'onsetDate')
+  expect.end()
+})
+
 it('removes info on relative from source case', function (expect) {
   var doc = fakeDoc({ contact: { sourceCases: [
     { relative: { phone: '12345678' } }
@@ -197,6 +207,15 @@ it('creates case with status', function (expect) {
   var doc = fakeDoc()
   var created = transform(doc)[1]
   expect.deepPropertyVal(created, 'case.status', 'unknown')
+  expect.end()
+})
+
+it('transfers onset date to case when given', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { onsetDate: '2015-05-20T11:44:53.427Z' }
+  ]}})
+  var created = transform(doc)[1]
+  expect.deepPropertyVal(created, 'case.onsetDate', '2015-05-20T11:44:53.427Z')
   expect.end()
 })
 
