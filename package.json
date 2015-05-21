@@ -2,10 +2,13 @@
   "name": "extract-source-cases-migration",
   "version": "1.2.0",
   "description": "Extract inlined source case information into dedicated person documents.",
-  "main": "index.js",
-  "bin": "cli.js",
+  "main": "lib/index.js",
+  "bin": {
+    "extract-source-cases": "bin/main.js"
+  },
+  "preferGlobal": true,
   "scripts": {
-    "test": "tape test.js | tap-spec"
+    "test": "tape test/index.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -17,7 +20,7 @@
     "contact",
     "person"
   ],
-  "author": "Tibor Claassen <tibor@gmah.net> (http://codebeige.net)",
+  "author": "Tibor Claassen <tibor@gmah.net>",
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/eHealthAfrica/extract-source-cases-migration/issues"
