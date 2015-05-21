@@ -98,8 +98,17 @@ function transform (original) {
               person.relative = sourceCase.relative
             }
 
+            if (sourceCase.onsetDate) {
+              person.case.onsetDate = sourceCase.onsetDate
+            }
+
             for (key in sourceCase) {
-              if (['id', 'phone', 'relative', 'name'].indexOf(key) < 0) {
+              if (['id'
+                  , 'phone'
+                  , 'relative'
+                  , 'name'
+                  , 'onsetDate'
+                  ].indexOf(key) < 0) {
                 inline[key] = sourceCase[key]
               }
             }

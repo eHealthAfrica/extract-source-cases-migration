@@ -107,3 +107,11 @@ Run the tests with
 ```sh
 npm test
 ```
+
+TODO
+----
+
+- extract and merge cases with identical id and matching(?) name
+- extract and merge cases without id and matching(?) name
+- output report about what was merged
+- interactive mode for merging
