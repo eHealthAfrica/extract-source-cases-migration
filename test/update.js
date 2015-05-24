@@ -2,7 +2,6 @@
 var it         = require('tape')
   , chai       = require('tape-chai')
   , fakeDoc    = require('./support/fake-doc')
-  , timekeeper = require('timekeeper')
   , dataModels = require('data-models')
 
 var migrate = require('../lib')

@@ -4,23 +4,23 @@ var it         = require('tape')
   , fakeDoc    = require('./support/fake-doc')
   , timekeeper = require('timekeeper')
   , dataModels = require('data-models')
+  , last       = require('lodash/array/last')
 
 var migrate = require('../lib')
 
 it('adds script name to change log', function (expect) {
   var doc = fakeDoc()
   var result = migrate(doc)
-  var changed = result[0]
-  expect.deepPropertyVal(changed, 'changeLog[0].user'
-                                , 'extract-source-cases-migration')
+  var log = last(result[0].changeLog)
+  expect.propertyVal(log, 'user', 'extract-source-cases-migration')
   expect.end()
 })
 
 it('adds revision to change log', function (expect) {
   var doc = fakeDoc({_rev: '5-revision-hash-id'})
   var result = migrate(doc)
-  var changed = result[0]
-  expect.deepPropertyVal(changed, 'changeLog[0].rev', '5-revision-hash-id')
+  var log = last(result[0].changeLog)
+  expect.propertyVal(log, 'rev', '5-revision-hash-id')
   expect.end()
 })
 
@@ -30,9 +30,8 @@ it('adds timestamp to change log', function (expect) {
   try {
     timekeeper.freeze(now)
     var result = migrate(doc)
-    var changed = result[0]
-    expect.deepPropertyVal(changed, 'changeLog[0].timestamp'
-                                  , 1422613414251)
+    var log = last(result[0].changeLog)
+    expect.propertyVal(log, 'timestamp', 1422613414251)
   } finally {
     timekeeper.reset()
     expect.end()
@@ -59,8 +58,7 @@ it('adds timestamp to source entry', function (expect) {
   var now = new Date(1422613414251)
   try {
     timekeeper.freeze(now)
-    var result = migrate(doc)
-    var created = result[1]
+    var created = migrate(doc)[1]
     expect.deepPropertyVal(created, 'sources[0].timestamp', 1422613414251)
   } finally {
     timekeeper.reset()
