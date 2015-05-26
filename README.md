@@ -18,7 +18,7 @@ extract-source-cases http://localhost:5984/persons
 ```
 
 Extracted source cases will be aggregated by default. Disable it with the
-`--no-aggregation` alias `-A` option:
+`--allow-duplicates` alias `-A` option:
 ```
 extract-source-cases -A http://localhost:5984/persons
 ```
