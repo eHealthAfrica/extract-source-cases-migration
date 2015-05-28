@@ -12,6 +12,7 @@ var manifest = require('../package.json')
   , knownOptions = { 'help' : Boolean
                    , 'version' : Boolean
                    , 'allow-duplicates' : Boolean
+                   , 'debug' : Boolean
                    }
   , shortHands   = { 'h' : ['--help']
                    , 'v' : ['--version']
@@ -68,7 +69,7 @@ options.database = parseUrl(options.argv.remain[0])
 if (options.database) {
   var database   = new PouchDB(options.database)
     , spinner    = new Spinner(chalk.blue('%s Migrating database...'))
-    , aggregator = (options.allowDuplicates) ? null : {}
+    , aggregator = (options.allowDuplicates) ? null : Object.create(null)
 
   spinner.start()
   database
@@ -77,6 +78,7 @@ if (options.database) {
     })
     .then(function () {
       spinner.stop(true)
+      if (options.debug) { console.log(aggregator) }
       process.exit()
     })
     .catch(function (error) {
