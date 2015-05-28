@@ -52,3 +52,39 @@ it('ignores abbreviation dots when matching', function (expect) {
   expect.lengthOf(result, 2)
   expect.end()
 })
+
+it('does not aggregate docs with empty case id', function (expect) {
+  var aggregator = Object.create(null)
+  var doc = fakeDoc({ contact: { sourceCases:
+    [ { id: '', name: 'John Doe' }
+    , { id: '', name: 'John Doe' }
+    ]
+  }})
+  var result = migrate(doc, aggregator)
+  expect.lengthOf(result, 3)
+  expect.end()
+})
+
+it('does not aggregate docs with whitespace only case id', function (expect) {
+  var aggregator = Object.create(null)
+  var doc = fakeDoc({ contact: { sourceCases:
+    [ { id: ' ', name: 'John Doe' }
+    , { id: ' ', name: 'John Doe' }
+    ]
+  }})
+  var result = migrate(doc, aggregator)
+  expect.lengthOf(result, 3)
+  expect.end()
+})
+
+it('does not aggregate docs without case id', function (expect) {
+  var aggregator = Object.create(null)
+  var doc = fakeDoc({ contact: { sourceCases:
+    [ { name: 'John Doe' }
+    , { name: 'John Doe' }
+    ]
+  }})
+  var result = migrate(doc, aggregator)
+  expect.lengthOf(result, 3)
+  expect.end()
+})
