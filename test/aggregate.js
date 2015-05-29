@@ -5,6 +5,10 @@ var it         = require('tape')
 
 var migrate = require('../lib')
 
+function firstRel (aggregator) {
+  return aggregator[Object.keys(aggregator)[0]]
+}
+
 it('aggregates cases with matching id and name', function (expect) {
   var aggregator = Object.create(null)
   var doc = fakeDoc({ contact: { sourceCases:
@@ -15,6 +19,20 @@ it('aggregates cases with matching id and name', function (expect) {
   var result = migrate(doc, aggregator)
   expect.lengthOf(result, 2)
   expect.end()
+})
+
+it('shares id on duplicates', function (expect) {
+  var aggregator = Object.create(null)
+  var doc = fakeDoc({ contact: { sourceCases:
+    [ { id: 'ID-0203', name: 'John Doe' }
+    , { id: 'ID-0203', name: 'John Doe' }
+    ]
+  }})
+  migrate(doc, aggregator)
+  var rel = firstRel(aggregator)
+  expect.equal(rel[0]._id, rel[1]._id)
+  expect.end()
+
 })
 
 it('ignores case when matching', function (expect) {
