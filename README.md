@@ -1,15 +1,34 @@
-# extract-source-cases-migration
+extract-source-cases-migration
+==============================
+
 Extract inlined source case information into dedicated person documents.
 
-[![Build Status](https://magnum.travis-ci.com/eHealthAfrica/extract-source-cases-migration.svg?token=Xm4EKuRzMq3zwKYpneZz)](https://magnum.travis-ci.com/eHealthAfrica/extract-source-cases-migration)
+[![Build Status](https://travis-ci.org/eHealthAfrica/extract-source-cases-migration.svg)](https://travis-ci.org/eHealthAfrica/extract-source-cases-migration)
+
+
 
 Usage
 -----
 
+### CLI
+
+```sh
+npm install -g extract-source-cases-migration
+extract-source-cases http://localhost:5984/persons
+```
+
+Extracted source cases will be aggregated by default. Disable it with the
+`--allow-duplicates` alias `-A` option:
+```
+extract-source-cases -A http://localhost:5984/persons
+```
+
+
+
 ### Node
 
 ```js
-var transform = require('extract-source-cases-migration')
+var migrate = require('extract-source-cases-migration')
 
 var contact =
   { _id: '00ae40fe-7b6f-4cea-df66-e00b59713944'
@@ -33,13 +52,13 @@ var contact =
     }
   }
 
-var docs = transform(contact)
+var docs = migrate(contact)
 ```
 
 This will produce the following data structure for `docs`:
 ```js
 [
-  // first doc is the transformed contact
+  // first doc is the updated contact
 
   { _id: '00ae40fe-7b6f-4cea-df66-e00b59713944'
   , _rev: '8-3a99b57d89647c15056dfb6a0ae9eb77'
@@ -90,15 +109,19 @@ This will produce the following data structure for `docs`:
     ]
   }
 ]
-
 ```
 
-### CLI
-
-```sh
-npm install -g extract-source-cases-migration
-extract-source-cases-migration http://localhost:5984/mydb
+Passing an aggregator object to each function call will create and reference a
+single doc for inline source cases that have matching `id` and `name`.
 ```
+var docs = []
+  , aggregator = {}
+
+docs.concat(migrate(contact1, aggregator))
+docs.concat(migrate(contact2, aggregator))
+```
+
+
 
 Testing
 -------
@@ -108,10 +131,9 @@ Run the tests with
 npm test
 ```
 
+
 TODO
 ----
 
-- extract and merge cases with identical id and matching(?) name
 - extract and merge cases without id and matching(?) name
 - output report about what was merged
-- interactive mode for merging

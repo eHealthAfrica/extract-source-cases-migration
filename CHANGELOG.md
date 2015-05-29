@@ -9,6 +9,15 @@ structured according to [Keep a Changelog](http://http://keepachangelog.com).
 ---
 
 ## Upcoming [unreleased]
+### Added
+- aggregate extracted docs with matching id and name
+- normalize id and name for matching
+- merge properties of deduplicated docs
+- add all sources to meta data
+- output help message
+- print version
+- show spinner when processing
+
 ### Changed
 - transfer `onsetDate` when given
 
