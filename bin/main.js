@@ -4,9 +4,11 @@ var nopt    = require('nopt')
   , url     = require('url')
   , PouchDB = require('pouchdb')
   , Spinner = require('cli-spinner').Spinner
-  , digest  = require('../lib')
   , mapKeys = require('lodash/object/mapKeys')
+  , pluck   = require('lodash/collection/pluck')
+  , digest  = require('../lib')
   , merge   = require('../lib/merge')
+  , report  = require('../lib/report')
 
 PouchDB.plugin(require('pouchdb-migrate'))
 
@@ -14,10 +16,12 @@ var manifest = require('../package.json')
   , knownOptions = { 'help' : Boolean
                    , 'version' : Boolean
                    , 'allow-duplicates' : Boolean
+                   , 'report' : Boolean
                    , 'debug' : Boolean
                    }
   , shortHands   = { 'h' : ['--help']
                    , 'v' : ['--version']
+                   , 'r' : ['--report']
                    , 'A' : ['--allow-duplicates']
                    }
   , options      = nopt(knownOptions, shortHands)
@@ -34,6 +38,7 @@ function showHelp () {
   console.log('  -v, --version             print version')
   console.log('  -h, --help                show help message')
   console.log('  -A, --allow-duplicates    do not aggregate duplicates')
+  console.log('  -r, --report              print exhaustive report to stdout')
   console.log('  --debug                   print debug info')
   console.log('')
   console.log('Examples:')
@@ -58,6 +63,12 @@ function parseUrl (arg) {
   return arg.href
 }
 
+function mergedAndSources (doc) {
+  return { merged: 1
+         , sources: doc.sources && doc.sources.length
+         }
+}
+
 if (options.version) {
   printVersion()
   process.exit()
@@ -73,11 +84,16 @@ if (options.database) {
   var database   = new PouchDB(options.database)
     , spinner    = new Spinner(chalk.blue('%s Extracting documents...'))
     , aggregator = (options['allow-duplicates']) ? null : Object.create(null)
+    , reporter   = report()
 
+  reporter.start()
   spinner.start()
+
   database
     .migrate(function (doc) {
-      return digest(doc, aggregator)
+      var results = digest(doc, aggregator)
+      reporter.count(results)
+      return results
     })
     .then(function (migration) {
       if (aggregator) {
@@ -88,12 +104,25 @@ if (options.database) {
         spinner = new Spinner(chalk.blue('%s Merging duplicates...'))
         spinner.start()
         return database.migrate(function (doc) {
-          return merge(doc, rels)
+          var results = merge(doc, rels)
+          reporter.count(results, mergedAndSources)
+          return results
         })
       }
     })
     .then(function (migration) {
       spinner.stop(true)
+      reporter.stop()
+      console.log(chalk.green('Done.'))
+      console.log(chalk.grey('Duration:', reporter.duration))
+      console.log( 'Updated:', reporter.updated
+                 , 'Created:', reporter.created
+                 , 'Total:'  , reporter.total
+                 )
+      var merged = reporter.amount('merged')
+      if (merged) {
+        console.log('Merged:', merged, 'from', reporter.amount('sources'))
+      }
       process.exit()
     })
     .catch(function (error) {
