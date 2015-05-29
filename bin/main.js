@@ -5,6 +5,8 @@ var nopt    = require('nopt')
   , PouchDB = require('pouchdb')
   , Spinner = require('cli-spinner').Spinner
   , digest  = require('../lib')
+  , mapKeys = require('lodash/object/mapKeys')
+  , merge   = require('../lib/merge')
 
 PouchDB.plugin(require('pouchdb-migrate'))
 
@@ -32,6 +34,7 @@ function showHelp () {
   console.log('  -v, --version             print version')
   console.log('  -h, --help                show help message')
   console.log('  -A, --allow-duplicates    do not aggregate duplicates')
+  console.log('  --debug                   print debug info')
   console.log('')
   console.log('Examples:')
   console.log(' ', name, 'http://localhost:5984/persons')
@@ -76,9 +79,18 @@ if (options.database) {
     .migrate(function (doc) {
       return digest(doc, aggregator)
     })
+    .then(function (result) {
+      if (aggregator) {
+        var rels = mapKeys( aggregator
+                            , function (rel, key) { return rel[0]._id }
+                            )
+        return database.migrate(function (doc) {
+          return merge(doc, rels)
+        })
+      }
+    })
     .then(function () {
       spinner.stop(true)
-      if (options.debug) { console.log(aggregator) }
       process.exit()
     })
     .catch(function (error) {
