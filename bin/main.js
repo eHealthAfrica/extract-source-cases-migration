@@ -71,25 +71,28 @@ if (options.help) {
 options.database = parseUrl(options.argv.remain[0])
 if (options.database) {
   var database   = new PouchDB(options.database)
-    , spinner    = new Spinner(chalk.blue('%s Migrating database...'))
-    , aggregator = (options.allowDuplicates) ? null : Object.create(null)
+    , spinner    = new Spinner(chalk.blue('%s Extracting documents...'))
+    , aggregator = (options['allow-duplicates']) ? null : Object.create(null)
 
   spinner.start()
   database
     .migrate(function (doc) {
       return digest(doc, aggregator)
     })
-    .then(function (result) {
+    .then(function (migration) {
       if (aggregator) {
         var rels = mapKeys( aggregator
                             , function (rel, key) { return rel[0]._id }
                             )
+        spinner.stop(true)
+        spinner = new Spinner(chalk.blue('%s Merging duplicates...'))
+        spinner.start()
         return database.migrate(function (doc) {
           return merge(doc, rels)
         })
       }
     })
-    .then(function () {
+    .then(function (migration) {
       spinner.stop(true)
       process.exit()
     })
