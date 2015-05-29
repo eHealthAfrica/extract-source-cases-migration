@@ -81,3 +81,11 @@ it('creates valid docs', function (expect) {
   expect.notOk(errors)
   expect.end()
 })
+
+it('keeps original data', function (expect) {
+  var doc = fakeDoc({contact: {sourceCases: [ { name: 'John Doe' } ]}})
+  var created = migrate(doc)[1]
+  expect.deepPropertyVal(created, 'sources[0].doc.name'
+                                , 'John Doe')
+  expect.end()
+})
