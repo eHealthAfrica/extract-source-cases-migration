@@ -4,8 +4,7 @@ var nopt    = require('nopt')
   , url     = require('url')
   , PouchDB = require('pouchdb')
   , Spinner = require('cli-spinner').Spinner
-  , mapKeys = require('lodash/object/mapKeys')
-  , pluck   = require('lodash/collection/pluck')
+  , _       = require('lodash')
   , digest  = require('../lib')
   , merge   = require('../lib/merge')
   , report  = require('../lib/report')
@@ -86,6 +85,15 @@ if (options.database) {
     , aggregator = (options['allow-duplicates']) ? null : Object.create(null)
     , reporter   = report()
 
+  if (options.report) {
+    reporter.table('merged docs', [ ['Case Id'    , 'case.id']
+                                  , ['Surname'    , 'surname']
+                                  , ['Other Names', 'otherNames']
+                                  , ['Phone'      , 'phoneNumber']
+                                  ]
+                  )
+  }
+
   reporter.start()
   spinner.start()
 
@@ -97,7 +105,7 @@ if (options.database) {
     })
     .then(function (migration) {
       if (aggregator) {
-        var rels = mapKeys( aggregator
+        var rels = _.mapKeys( aggregator
                             , function (rel, key) { return rel[0]._id }
                             )
         spinner.stop(true)
@@ -106,6 +114,7 @@ if (options.database) {
         return database.migrate(function (doc) {
           var results = merge(doc, rels)
           reporter.count(results, mergedAndSources)
+          reporter.rows('merged docs', results)
           return results
         })
       }
@@ -122,6 +131,7 @@ if (options.database) {
       var merged = reporter.amount('merged')
       if (merged) {
         console.log('Merged:', merged, 'from', reporter.amount('sources'))
+        console.log(reporter.render('merged docs'))
       }
       process.exit()
     })

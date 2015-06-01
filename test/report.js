@@ -5,6 +5,11 @@ var it   = require('tape')
 
 var report = require('../lib/report')
 
+function tableCells(table) {
+  var rows = table.split("\n").filter(function (r, i) { return i % 2 !== 0 })
+  return rows.map(function (r) { return r.split(/\s*│\s*/).slice(1, -1) })
+}
+
 it('duration is zero when not started', function (expect) {
   var reporter = report()
   expect.propertyVal(reporter, 'duration', '00:00:00')
@@ -120,4 +125,51 @@ it('does not complain counting skipped results', function (expect) {
   var reporter = report()
   expect.doesNotThrow(function () { reporter.count(null) })
   expect.end()
+})
+
+it('collects and renders tabular data', function (expect) {
+  var reporter = report()
+  reporter.table('docs', [ ['Surname', 'surname']
+                         , ['Other Names', 'otherNames']
+                         ]
+                )
+  reporter.rows('docs', [{surname: 'Doe', otherNames: 'John P.'}])
+  var table = reporter.render('docs')
+  expect.deepEquals(tableCells(table), [ ['Surname', 'Other Names']
+                                       , ['Doe', 'John P.']
+                                       ]
+                   )
+  expect.end()
+})
+
+it('does not complain collecting void rows', function (expect) {
+  var reporter = report()
+  reporter.table('docs', [['Surname', 'surname']])
+  expect.doesNotThrow(function () { reporter.rows('docs', null) })
+  expect.end()
+})
+
+it('does not complain filling invalid tables', function (expect) {
+  var reporter = report()
+  expect.doesNotThrow(function () { reporter.rows('baz', [{surname: 'Doe'}]) })
+  expect.end()
+})
+
+it('collects nested values', function (expect) {
+  var reporter = report()
+  reporter.table('docs', [ ['Id', 'case.id'] ])
+  reporter.rows('docs', [ {case: {id: '99'}} ])
+  var table = reporter.render('docs')
+  expect.deepEquals(tableCells(table)[1], ['99'])
+  expect.end()
+})
+
+it('leaves cell blank for undefined value', function (expect) {
+  var reporter = report()
+  reporter.table('docs', [ ['Surname', 'surname'] ])
+  reporter.rows('docs', [ {} ])
+  var table = reporter.render('docs')
+  expect.deepEquals(tableCells(table)[1], [''])
+  expect.end()
+
 })
