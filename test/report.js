@@ -171,5 +171,13 @@ it('leaves cell blank for undefined value', function (expect) {
   var table = reporter.render('docs')
   expect.deepEquals(tableCells(table)[1], [''])
   expect.end()
+})
 
+it('renders objects inside cells as JSON', function (expect) {
+  var reporter = report()
+  reporter.table('docs', [ ['Relative', 'relative'] ])
+  reporter.rows('docs', [ {relative: {name: 'Jeanette'}} ])
+  var table = reporter.render('docs')
+  expect.deepEquals(tableCells(table)[1], ['{"name":"Jeanette"}'])
+  expect.end()
 })

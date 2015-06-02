@@ -94,6 +94,15 @@ if (options.database) {
                   )
   }
 
+  if (options.debug) {
+    reporter.table('merged sources', [ ['Case Id' , 'doc.id']
+                                     , ['Name'    , 'doc.name']
+                                     , ['Phone'   , 'doc.phone']
+                                     , ['Relative', 'doc.relative']
+                                  ]
+                  )
+  }
+
   reporter.start()
   spinner.start()
 
@@ -115,6 +124,9 @@ if (options.database) {
           var results = merge(doc, rels)
           reporter.count(results, mergedAndSources)
           reporter.rows('merged docs', results)
+          if (options.debug) {
+            reporter.rows('merged sources', results && results[0].sources)
+          }
           return results
         })
       }
@@ -132,6 +144,12 @@ if (options.database) {
       if (merged) {
         console.log('Merged:', merged, 'from', reporter.amount('sources'))
         console.log(reporter.render('merged docs'))
+        if (options.debug) {
+          console.log('')
+          console.log('===========================================================================')
+          console.log('')
+          console.log(reporter.render('merged sources'))
+        }
       }
       process.exit()
     })
