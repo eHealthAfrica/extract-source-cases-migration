@@ -1,7 +1,7 @@
 'use strict'
-var it         = require('tape')
-  , chai       = require('tape-chai')
-  , fakeDoc    = require('./support/fake-doc')
+var it      = require('tape')
+  , chai    = require('tape-chai')
+  , fakeDoc = require('./support/fake-doc')
 
 var migrate = require('../lib')
 

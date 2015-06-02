@@ -17,6 +17,9 @@ structured according to [Keep a Changelog](http://http://keepachangelog.com).
 - output help message
 - print version
 - show spinner when processing
+- report amount of docs created, updated, and merged
+- option to report table of merged documents
+- debug output with table of merged sources
 
 ### Changed
 - transfer `onsetDate` when given
