@@ -8,7 +8,7 @@ structured according to [Keep a Changelog](http://http://keepachangelog.com).
 
 ---
 
-## Upcoming [unreleased]
+## 1.3.0 [2015-06-02]
 ### Added
 - aggregate extracted docs with matching id and name
 - normalize id and name for matching
