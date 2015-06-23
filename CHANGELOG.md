@@ -8,6 +8,10 @@ structured according to [Keep a Changelog](http://http://keepachangelog.com).
 
 ---
 
+## 1.3.1 [2015-06-23]
+### Fixed
+- correctly transfer two-part name from inline source case
+
 ## 1.3.0 [2015-06-02]
 ### Added
 - aggregate extracted docs with matching id and name
