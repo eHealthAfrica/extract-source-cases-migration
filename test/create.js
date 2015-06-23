@@ -87,7 +87,7 @@ it('transfers info on relative', function (expect) {
   expect.end()
 })
 
-it('extracts surname', function (expect) {
+it('extracts surname from name', function (expect) {
   var doc = fakeDoc({ contact: { sourceCases: [
     { name: 'Sally S. Doe' }
   ]}})
@@ -96,9 +96,27 @@ it('extracts surname', function (expect) {
   expect.end()
 })
 
-it('extracts other names', function (expect) {
+it('extracts other names from name', function (expect) {
   var doc = fakeDoc({ contact: { sourceCases: [
     { name: 'Sally S. Doe' }
+  ]}})
+  var created = migrate(doc)[1]
+  expect.propertyVal(created, 'otherNames', 'Sally S.')
+  expect.end()
+})
+
+it('transfers surname', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { surname: 'Doe' }
+  ]}})
+  var created = migrate(doc)[1]
+  expect.propertyVal(created, 'surname', 'Doe')
+  expect.end()
+})
+
+it('transfers other names', function (expect) {
+  var doc = fakeDoc({ contact: { sourceCases: [
+    { otherNames: 'Sally S.' }
   ]}})
   var created = migrate(doc)[1]
   expect.propertyVal(created, 'otherNames', 'Sally S.')
